@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+
+@page {
+size: A4;
+margin: 25px;
+}
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+font-size:13px;
+color:#333;
+}
+
+.top-bar{
+height:10px;
+background:#6b4caf;
+margin-bottom:20px;
+}
+
+/* HEADER */
+
+.header{
+display:flex;
+justify-content:space-between;
+}
+
+.title{
+font-size:42px;
+font-weight:300;
+}
+
+.company{
+text-align:right;
+font-size:12px;
+line-height:18px;
+}
+
+/* INVOICE INFO */
+
+.invoice-info{
+margin-top:20px;
+display:flex;
+justify-content:space-between;
+}
+
+.bill{
+font-size:12px;
+line-height:18px;
+}
+
+.invoice-details{
+text-align:right;
+font-size:12px;
+line-height:18px;
+}
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th{
+text-align:left;
+padding:8px;
+border-bottom:2px solid #ccc;
+font-size:12px;
+}
+
+td{
+padding:8px;
+border-bottom:1px solid #eee;
+font-size:12px;
+}
+
+/* TOTAL */
+
+.total-section{
+margin-top:25px;
+display:flex;
+justify-content:space-between;
+}
+
+.notes{
+width:60%;
+font-size:12px;
+line-height:18px;
+}
+
+.total{
+text-align:right;
+}
+
+.total h2{
+font-size:28px;
+margin:0;
+}
+
+/* FOOTER */
+
+.footer{
+margin-top:30px;
+text-align:center;
+font-size:11px;
+color:#777;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="top-bar"></div>
+
+<!-- HEADER -->
+
+<div class="header">
+
+<div>
+<div class="title">Invoice</div>
+</div>
+
+<div class="company">
+
+<strong>Your Company Name</strong><br>
+Your Business Address<br>
+City<br>
+Country
+
+</div>
+
+</div>
+
+<hr>
+
+<!-- INVOICE INFO -->
+
+<div class="invoice-info">
+
+<div class="bill">
+
+<strong>BILL TO:</strong><br><br>
+
+{{ invoice.customer_name }}<br>
+{{ invoice.customer_address }}<br>
+{{ invoice.city }}<br>
+{{ invoice.country }}
+
+</div>
+
+<div class="invoice-details">
+
+<strong>INVOICE #</strong><br>
+{{ invoice.id }}<br><br>
+
+<strong>DATE</strong><br>
+{{ invoice.date|date:"d M Y" }}<br><br>
+
+<strong>DUE DATE</strong><br>
+{{ invoice.date|date:"d M Y" }}
+
+</div>
+
+</div>
+
+<!-- ITEMS TABLE -->
+
+<table>
+
+<tr>
+<th>ITEM</th>
+<th>DESCRIPTION</th>
+<th>QUANTITY</th>
+<th>PRICE</th>
+<th>TAX</th>
+<th>AMOUNT</th>
+</tr>
+
+<tr>
+<td>{{ product.name }}</td>
+<td>{{ product.category }}</td>
+<td>{{ quantity }}</td>
+<td>Rs. {{ price|floatformat:2 }}</td>
+<td>18%</td>
+<td>Rs. {{ total|floatformat:2 }}</td>
+</tr>
+
+</table>
+
+<!-- TOTAL SECTION -->
+
+<div class="total-section">
+
+<div class="notes">
+
+<strong>NOTES:</strong><br><br>
+
+Thank you for your business.<br>
+This invoice was generated automatically by the Inventory Management System.
+
+</div>
+
+<div class="total">
+
+<strong>TOTAL</strong>
+
+<h2>Rs. {{ total|floatformat:2 }}</h2>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+Powered by Inventory Management System
+
+</div>
+
+</body>
+</html>

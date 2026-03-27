@@ -1,0 +1,120 @@
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+
+<style>
+
+/* CENTER */
+.register-container{
+    height:90vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CARD */
+.register-card{
+    background:white;
+    padding:40px;
+    border-radius:16px;
+    width:380px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.12);
+    animation:fadeInUp 0.6s ease;
+}
+
+/* TITLE */
+.register-card h2{
+    text-align:center;
+    margin-bottom:25px;
+    font-weight:700;
+}
+
+/* INPUT */
+.form-control{
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:15px;
+}
+
+/* BUTTON */
+.btn-register{
+    width:100%;
+    padding:12px;
+    background:linear-gradient(135deg,#22c55e,#16a34a);
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-weight:500;
+    transition:0.3s;
+}
+
+.btn-register:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(34,197,94,0.4);
+}
+
+/* LINK */
+.link{
+    text-align:center;
+    margin-top:15px;
+}
+
+/* ALERT */
+.alert{
+    font-size:14px;
+    padding:10px;
+}
+
+/* ANIMATION */
+@keyframes fadeInUp{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+</style>
+
+<div class="register-container">
+
+<div class="register-card">
+
+<h2><i class="bi bi-person-plus"></i> Register</h2>
+
+<!-- MESSAGES -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger text-center">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="POST">
+{% csrf_token %}
+
+<input type="text" name="username" placeholder="Username" class="form-control" required>
+
+<input type="password" name="password" placeholder="Password" class="form-control" required>
+
+<!-- OPTIONAL (BEST PRACTICE) -->
+<input type="password" name="confirm_password" placeholder="Confirm Password" class="form-control" required>
+
+<button type="submit" class="btn-register">Create Account</button>
+
+</form>
+
+<div class="link">
+Already have an account?
+<a href="{% url 'login' %}">Login</a>
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

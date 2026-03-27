@@ -1,0 +1,185 @@
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+
+<!-- HEADER WITH USER + LOGOUT -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h3 class="fw-bold">Inventory Overview</h3>
+
+    <div>
+        <span class="text-muted me-3">
+            <i class="bi bi-person-circle"></i> {{ request.user.username }}
+        </span>
+
+        <!-- ✅ FIXED LOGOUT BUTTON -->
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+
+</div>
+
+
+<!-- STATS -->
+
+<div class="row g-4">
+
+<div class="col-md-4">
+<div class="stat-card card-blue">
+<h6><i class="bi bi-box"></i> Total Products</h6>
+<h1>{{ total_products }}</h1>
+<p class="mb-0">Items available in inventory</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="stat-card card-red">
+<h6><i class="bi bi-exclamation-triangle"></i> Low Stock</h6>
+<h1>{{ low_stock }}</h1>
+<p class="mb-0">Products need restocking</p>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="stat-card card-green">
+<h6><i class="bi bi-truck"></i> Total Suppliers</h6>
+<h1>{{ total_suppliers }}</h1>
+<p class="mb-0">Active suppliers</p>
+</div>
+</div>
+
+</div>
+
+
+<!-- CHART + ALERT -->
+
+<div class="row mt-5">
+
+<div class="col-md-7">
+<div class="chart-card">
+<h5 class="mb-4">Inventory Analytics</h5>
+<canvas id="chart"></canvas>
+</div>
+</div>
+
+<div class="col-md-5">
+<div class="chart-card">
+<h5 class="mb-3">Low Stock Alert</h5>
+
+{% if low_stock > 0 %}
+<div class="alert alert-danger">
+⚠ {{ low_stock }} product(s) need restocking
+</div>
+{% else %}
+<div class="alert alert-success">
+✅ All products have sufficient stock
+</div>
+{% endif %}
+
+</div>
+</div>
+
+</div>
+
+
+<!-- RECENT PRODUCTS -->
+
+<div class="chart-card mt-5">
+
+<h5 class="mb-4">Recent Products</h5>
+
+<table class="table table-hover align-middle">
+
+<thead class="table-light">
+
+<tr>
+<th>Name</th>
+<th>Category</th>
+<th>Price</th>
+<th>Quantity</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for product in recent_products %}
+
+<tr>
+
+<td class="fw-semibold">{{ product.name }}</td>
+<td>{{ product.category }}</td>
+<td>₹ {{ product.price }}</td>
+<td>
+    {% if product.quantity < 5 %}
+        <span class="badge bg-danger">{{ product.quantity }}</span>
+    {% else %}
+        <span class="badge bg-success">{{ product.quantity }}</span>
+    {% endif %}
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4" class="text-center text-muted">
+No products available
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<!-- CHART SCRIPT -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const ctx = document.getElementById('chart').getContext('2d');
+
+const totalProducts = Number("{{ total_products }}");
+const lowStock = Number("{{ low_stock }}");
+
+new Chart(ctx, {
+
+type:'doughnut',
+
+data:{
+labels:['Total Products','Low Stock'],
+datasets:[{
+data:[totalProducts,lowStock],
+backgroundColor:[
+'#3b82f6',
+'#ef4444'
+]
+}]
+},
+
+options:{
+responsive:true,
+plugins:{
+legend:{
+position:'bottom'
+}
+}
+}
+
+});
+
+});
+
+</script>
+
+{% endblock %}

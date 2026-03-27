@@ -1,0 +1,42 @@
+{% extends 'inventory/base.html' %}
+
+{% block content %}
+
+<h3>Add Product</h3>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Category</label>
+        <input type="text" name="category" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Price</label>
+        <input type="number" name="price" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Quantity</label>
+        <input type="number" name="quantity" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Supplier</label>
+        <select name="supplier" class="form-control">
+            {% for supplier in suppliers %}
+            <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+
+{% endblock %}
