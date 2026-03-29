@@ -10,7 +10,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 from django.db.models import Sum
-from xhtml2pdf import pisa
+
+# ❌ REMOVE THIS (IMPORTANT)
+# from xhtml2pdf import pisa
 
 from .models import Product, Supplier, Invoice, Category, SupplierTransaction
 
@@ -130,7 +132,6 @@ def supplier_list(request):
     for supplier in suppliers:
         transactions = SupplierTransaction.objects.filter(supplier=supplier)
 
-        # 🔥 GROUP PRODUCTS
         product_summary = defaultdict(lambda: {'IN': 0, 'OUT': 0})
 
         for t in transactions:
@@ -186,7 +187,6 @@ def add_transaction(request):
             transaction_type=t_type
         )
 
-        # 🔥 AUTO STOCK UPDATE
         if t_type == 'IN':
             product.quantity += quantity
         else:
@@ -211,7 +211,7 @@ def reports(request):
     })
 
 
-# ================= INVOICE =================
+# ================= INVOICE (UPDATED - NO PDF) =================
 @login_required(login_url='login')
 def generate_invoice(request, pk):
     product = get_object_or_404(Product, id=pk)
@@ -231,9 +231,8 @@ def generate_invoice(request, pk):
         total=total
     )
 
-    template = get_template("inventory/invoice.html")
-
-    html = template.render({
+    # 🔥 SIMPLE HTML RESPONSE (NO PDF)
+    return render(request, "inventory/invoice.html", {
         "invoice": invoice,
         "product": product,
         "quantity": 1,
@@ -241,10 +240,3 @@ def generate_invoice(request, pk):
         "tax": tax,
         "total": total,
     })
-
-    response = HttpResponse(content_type="application/pdf")
-    response["Content-Disposition"] = f'attachment; filename="invoice_{invoice.id}.pdf"'
-
-    pisa.CreatePDF(html, dest=response)
-
-    return response
