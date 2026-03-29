@@ -5,110 +5,106 @@
 <style>
 
 @page {
-size: A4;
-margin: 25px;
+    size: A4;
+    margin: 25px;
 }
 
-body{
-font-family: Arial, Helvetica, sans-serif;
-font-size:13px;
-color:#333;
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    color: #333;
 }
 
-.top-bar{
-height:10px;
-background:#6b4caf;
-margin-bottom:20px;
+.top-bar {
+    height: 10px;
+    background: #6b4caf;
+    margin-bottom: 20px;
 }
 
 /* HEADER */
 
-.header{
-display:flex;
-justify-content:space-between;
+.header-table {
+    width: 100%;
 }
 
-.title{
-font-size:42px;
-font-weight:300;
+.title {
+    font-size: 36px;
+    font-weight: bold;
 }
 
-.company{
-text-align:right;
-font-size:12px;
-line-height:18px;
+.company {
+    text-align: right;
+    font-size: 12px;
+    line-height: 18px;
 }
 
 /* INVOICE INFO */
 
-.invoice-info{
-margin-top:20px;
-display:flex;
-justify-content:space-between;
+.info-table {
+    width: 100%;
+    margin-top: 20px;
 }
 
-.bill{
-font-size:12px;
-line-height:18px;
+.bill {
+    font-size: 12px;
+    line-height: 18px;
 }
 
-.invoice-details{
-text-align:right;
-font-size:12px;
-line-height:18px;
+.invoice-details {
+    text-align: right;
+    font-size: 12px;
+    line-height: 18px;
 }
 
 /* TABLE */
 
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-th{
-text-align:left;
-padding:8px;
-border-bottom:2px solid #ccc;
-font-size:12px;
+th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 2px solid #ccc;
+    font-size: 12px;
 }
 
-td{
-padding:8px;
-border-bottom:1px solid #eee;
-font-size:12px;
+td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 12px;
 }
 
 /* TOTAL */
 
-.total-section{
-margin-top:25px;
-display:flex;
-justify-content:space-between;
+.total-table {
+    width: 100%;
+    margin-top: 25px;
 }
 
-.notes{
-width:60%;
-font-size:12px;
-line-height:18px;
+.notes {
+    font-size: 12px;
+    line-height: 18px;
 }
 
-.total{
-text-align:right;
+.total {
+    text-align: right;
 }
 
-.total h2{
-font-size:28px;
-margin:0;
+.total h2 {
+    font-size: 24px;
+    margin: 0;
 }
 
 /* FOOTER */
 
-.footer{
-margin-top:30px;
-text-align:center;
-font-size:11px;
-color:#777;
+.footer {
+    margin-top: 30px;
+    text-align: center;
+    font-size: 11px;
+    color: #777;
 }
 
 </style>
@@ -121,31 +117,26 @@ color:#777;
 
 <!-- HEADER -->
 
-<div class="header">
-
-<div>
-<div class="title">Invoice</div>
-</div>
-
-<div class="company">
-
+<table class="header-table">
+<tr>
+<td class="title">Invoice</td>
+<td class="company">
 <strong>Your Company Name</strong><br>
 Your Business Address<br>
 City<br>
 Country
-
-</div>
-
-</div>
+</td>
+</tr>
+</table>
 
 <hr>
 
 <!-- INVOICE INFO -->
 
-<div class="invoice-info">
+<table class="info-table">
+<tr>
 
-<div class="bill">
-
+<td class="bill">
 <strong>BILL TO:</strong><br><br>
 
 {{ invoice.customer_name }}<br>
@@ -153,9 +144,9 @@ Country
 {{ invoice.city }}<br>
 {{ invoice.country }}
 
-</div>
+</td>
 
-<div class="invoice-details">
+<td class="invoice-details">
 
 <strong>INVOICE #</strong><br>
 {{ invoice.id }}<br><br>
@@ -166,9 +157,10 @@ Country
 <strong>DUE DATE</strong><br>
 {{ invoice.date|date:"d M Y" }}
 
-</div>
+</td>
 
-</div>
+</tr>
+</table>
 
 <!-- ITEMS TABLE -->
 
@@ -196,33 +188,32 @@ Country
 
 <!-- TOTAL SECTION -->
 
-<div class="total-section">
+<table class="total-table">
+<tr>
 
-<div class="notes">
+<td class="notes">
 
 <strong>NOTES:</strong><br><br>
 
 Thank you for your business.<br>
 This invoice was generated automatically by the Inventory Management System.
 
-</div>
+</td>
 
-<div class="total">
+<td class="total">
 
-<strong>TOTAL</strong>
-
+<strong>TOTAL</strong><br>
 <h2>Rs. {{ total|floatformat:2 }}</h2>
 
-</div>
+</td>
 
-</div>
+</tr>
+</table>
 
 <!-- FOOTER -->
 
 <div class="footer">
-
 Powered by Inventory Management System
-
 </div>
 
 </body>

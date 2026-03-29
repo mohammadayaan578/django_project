@@ -1,7 +1,7 @@
 from django.db import models
 
 
-# SUPPLIER MODEL
+# ================= SUPPLIER =================
 class Supplier(models.Model):
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
@@ -12,7 +12,7 @@ class Supplier(models.Model):
         return self.name
 
 
-# CATEGORY MODEL
+# ================= CATEGORY =================
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
@@ -20,7 +20,7 @@ class Category(models.Model):
         return self.name
 
 
-# PRODUCT MODEL
+# ================= PRODUCT =================
 class Product(models.Model):
     name = models.CharField(max_length=200)
 
@@ -30,17 +30,22 @@ class Product(models.Model):
         related_name='products'
     )
 
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    # ✅ FIX: ADD SUPPLIER FIELD
+    supplier = models.ForeignKey(
+        Supplier,
+        on_delete=models.CASCADE,
+        related_name='products'
+    )
 
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField()
 
     def __str__(self):
         return self.name
 
 
-# INVOICE MODEL
+# ================= INVOICE =================
 class Invoice(models.Model):
-
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     customer_name = models.CharField(max_length=200)
@@ -49,7 +54,6 @@ class Invoice(models.Model):
     country = models.CharField(max_length=100)
 
     quantity = models.IntegerField()
-
     price = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=12, decimal_places=2)
 
@@ -59,15 +63,16 @@ class Invoice(models.Model):
         return f"Invoice {self.id}"
 
 
-
+# ================= SUPPLIER TRANSACTION =================
 class SupplierTransaction(models.Model):
     TRANSACTION_TYPE = (
-        ('IN', 'Stock In'),   # supplier se liya
-        ('OUT', 'Stock Out'), # supplier ko diya
+        ('IN', 'Stock In'),
+        ('OUT', 'Stock Out'),
     )
 
-    supplier = models.ForeignKey('Supplier', on_delete=models.CASCADE)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
     quantity = models.IntegerField()
     transaction_type = models.CharField(max_length=3, choices=TRANSACTION_TYPE)
     date = models.DateTimeField(auto_now_add=True)

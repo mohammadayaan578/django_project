@@ -7,31 +7,42 @@
 <form method="POST">
     {% csrf_token %}
 
+    <!-- NAME -->
     <div class="mb-3">
         <label>Name</label>
-        <input type="text" name="name" class="form-control">
+        <input type="text" name="name" class="form-control" required>
     </div>
 
+    <!-- CATEGORY (FIXED) -->
     <div class="mb-3">
         <label>Category</label>
-        <input type="text" name="category" class="form-control">
+        <select name="category" class="form-control" required>
+            <option value="">Select Category</option>
+            {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+            {% endfor %}
+        </select>
     </div>
 
+    <!-- PRICE -->
     <div class="mb-3">
         <label>Price</label>
-        <input type="number" name="price" class="form-control">
+        <input type="number" name="price" class="form-control" required>
     </div>
 
+    <!-- QUANTITY -->
     <div class="mb-3">
         <label>Quantity</label>
-        <input type="number" name="quantity" class="form-control">
+        <input type="number" name="quantity" class="form-control" required>
     </div>
 
+    <!-- SUPPLIER (FIXED) -->
     <div class="mb-3">
         <label>Supplier</label>
-        <select name="supplier" class="form-control">
+        <select name="supplier" class="form-control" required>
+            <option value="">Select Supplier</option>
             {% for supplier in suppliers %}
-            <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                <option value="{{ supplier.id }}">{{ supplier.name }}</option>
             {% endfor %}
         </select>
     </div>

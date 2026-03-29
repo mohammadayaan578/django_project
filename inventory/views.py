@@ -2,13 +2,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.template.loader import get_template
 from decimal import Decimal
+from collections import defaultdict
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from django.db import models
+from django.db.models import Sum
+from xhtml2pdf import pisa
 
 from .models import Product, Supplier, Invoice, Category, SupplierTransaction
 
@@ -42,7 +44,7 @@ def login_view(request):
 
         user = authenticate(request, username=username, password=password)
 
-        if user is not None:
+        if user:
             login(request, user)
             return redirect('dashboard')
         else:
@@ -60,24 +62,20 @@ def logout_view(request):
 # ================= DASHBOARD =================
 @login_required(login_url='login')
 def dashboard(request):
-    total_products = Product.objects.count()
-    low_stock = Product.objects.filter(quantity__lt=5).count()
-    total_suppliers = Supplier.objects.count()
-    recent_products = Product.objects.all().order_by('-id')[:5]
-
     return render(request, 'inventory/dashboard.html', {
-        'total_products': total_products,
-        'low_stock': low_stock,
-        'total_suppliers': total_suppliers,
-        'recent_products': recent_products
+        'total_products': Product.objects.count(),
+        'low_stock': Product.objects.filter(quantity__lt=5).count(),
+        'total_suppliers': Supplier.objects.count(),
+        'recent_products': Product.objects.all().order_by('-id')[:5]
     })
 
 
 # ================= PRODUCTS =================
 @login_required(login_url='login')
 def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'inventory/product_list.html', {'products': products})
+    return render(request, 'inventory/product_list.html', {
+        'products': Product.objects.all()
+    })
 
 
 @login_required(login_url='login')
@@ -93,10 +91,11 @@ def add_product(request):
         )
         return redirect('product_list')
 
-    return render(request, 'inventory/add_product.html', {'categories': categories})
+    return render(request, 'inventory/add_product.html', {
+        'categories': categories
+    })
 
 
-# ✅ UPDATE PRODUCT (FIXED)
 @login_required(login_url='login')
 def update_product(request, pk):
     product = get_object_or_404(Product, pk=pk)
@@ -108,7 +107,6 @@ def update_product(request, pk):
         product.price = request.POST.get('price')
         product.quantity = request.POST.get('quantity')
         product.save()
-
         return redirect('product_list')
 
     return render(request, 'inventory/update_product.html', {
@@ -127,15 +125,30 @@ def delete_product(request, pk):
 @login_required(login_url='login')
 def supplier_list(request):
     suppliers = Supplier.objects.all()
+    supplier_data = []
 
-    for s in suppliers:
-        total = SupplierTransaction.objects.filter(supplier=s).aggregate(sum_qty=models.Sum('quantity'))
-        s.total_supplied = total['sum_qty'] or 0
+    for supplier in suppliers:
+        transactions = SupplierTransaction.objects.filter(supplier=supplier)
 
-    return render(request, 'inventory/supplier_list.html', {'suppliers': suppliers})
+        # 🔥 GROUP PRODUCTS
+        product_summary = defaultdict(lambda: {'IN': 0, 'OUT': 0})
+
+        for t in transactions:
+            product_summary[t.product.name][t.transaction_type] += t.quantity
+
+        total = transactions.aggregate(total=Sum('quantity'))['total'] or 0
+
+        supplier_data.append({
+            'supplier': supplier,
+            'products': dict(product_summary),
+            'total': total
+        })
+
+    return render(request, 'inventory/supplier_list.html', {
+        'supplier_data': supplier_data
+    })
 
 
-# ✅ UPDATE SUPPLIER (ADDED)
 @login_required(login_url='login')
 def update_supplier(request, pk):
     supplier = get_object_or_404(Supplier, pk=pk)
@@ -146,7 +159,6 @@ def update_supplier(request, pk):
         supplier.email = request.POST.get('email')
         supplier.address = request.POST.get('address')
         supplier.save()
-
         return redirect('supplier_list')
 
     return render(request, 'inventory/update_supplier.html', {'supplier': supplier})
@@ -174,6 +186,7 @@ def add_transaction(request):
             transaction_type=t_type
         )
 
+        # 🔥 AUTO STOCK UPDATE
         if t_type == 'IN':
             product.quantity += quantity
         else:
@@ -183,31 +196,24 @@ def add_transaction(request):
 
         return redirect('product_list')
 
-    suppliers = Supplier.objects.all()
-    products = Product.objects.all()
-
     return render(request, 'inventory/add_transaction.html', {
-        'suppliers': suppliers,
-        'products': products
+        'suppliers': Supplier.objects.all(),
+        'products': Product.objects.all()
     })
 
 
 # ================= REPORTS =================
 @login_required(login_url='login')
 def reports(request):
-    total_products = Product.objects.count()
-    low_stock_products = Product.objects.filter(quantity__lt=5)
-
     return render(request, 'inventory/reports.html', {
-        'total_products': total_products,
-        'low_stock_products': low_stock_products
+        'total_products': Product.objects.count(),
+        'low_stock_products': Product.objects.filter(quantity__lt=5)
     })
 
 
 # ================= INVOICE =================
 @login_required(login_url='login')
 def generate_invoice(request, pk):
-
     product = get_object_or_404(Product, id=pk)
 
     price = Decimal(product.price)
@@ -216,9 +222,9 @@ def generate_invoice(request, pk):
 
     invoice = Invoice.objects.create(
         product=product,
-        customer_name="Mohammad Ayaan",
-        customer_address="Islam Colony",
-        city="Shahabad",
+        customer_name="Customer",
+        customer_address="Address",
+        city="City",
         country="India",
         quantity=1,
         price=price,

@@ -15,6 +15,7 @@
 <th>Phone</th>
 <th>Email</th>
 <th>Address</th>
+<th>Products</th>
 <th>Total Supply</th>
 <th>Actions</th>
 </tr>
@@ -22,35 +23,68 @@
 
 <tbody>
 
-{% for supplier in suppliers %}
+{% for data in supplier_data %}
 
 <tr>
 
-<td class="fw-semibold">{{ supplier.name }}</td>
-<td>{{ supplier.phone }}</td>
-<td>{{ supplier.email }}</td>
-<td>{{ supplier.address }}</td>
+<td class="fw-semibold">{{ data.supplier.name }}</td>
+<td>{{ data.supplier.phone }}</td>
+<td>{{ data.supplier.email }}</td>
+<td>{{ data.supplier.address }}</td>
 
-<td>
-{% if supplier.total_supplied %}
-<span class="badge bg-success">
-{{ supplier.total_supplied }}
-</span>
-{% else %}
-<span class="badge bg-secondary">
-0
-</span>
-{% endif %}
+<!-- ✅ PRODUCTS (GROUPED CLEAN UI) -->
+<td style="min-width: 220px;">
+
+    {% for product, values in data.products.items %}
+    
+    <div class="d-flex align-items-center justify-content-between mb-2 p-2 border rounded bg-light">
+
+        <!-- PRODUCT NAME -->
+        <span class="fw-semibold text-dark">
+            {{ product }}
+        </span>
+
+        <!-- BADGES -->
+        <div>
+
+            {% if values.IN > 0 %}
+            <span class="badge bg-success me-1">
+                IN {{ values.IN }}
+            </span>
+            {% endif %}
+
+            {% if values.OUT > 0 %}
+            <span class="badge bg-danger">
+                OUT {{ values.OUT }}
+            </span>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% empty %}
+        <span class="text-muted">No transactions</span>
+    {% endfor %}
+
 </td>
 
+<!-- TOTAL -->
+<td>
+<span class="badge bg-success px-3 py-2">
+{{ data.total }}
+</span>
+</td>
+
+<!-- ACTIONS -->
 <td>
 
-<a href="{% url 'update_supplier' supplier.id %}" 
+<a href="{% url 'update_supplier' data.supplier.id %}" 
 class="btn btn-sm btn-warning">
 <i class="bi bi-pencil"></i>
 </a>
 
-<a href="{% url 'delete_supplier' supplier.id %}" 
+<a href="{% url 'delete_supplier' data.supplier.id %}" 
 class="btn btn-sm btn-danger"
 onclick="return confirm('Are you sure you want to delete this supplier?');">
 <i class="bi bi-trash"></i>
@@ -63,7 +97,7 @@ onclick="return confirm('Are you sure you want to delete this supplier?');">
 {% empty %}
 
 <tr>
-<td colspan="6" class="text-center text-muted">
+<td colspan="7" class="text-center text-muted">
 No suppliers available
 </td>
 </tr>

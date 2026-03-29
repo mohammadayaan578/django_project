@@ -2,6 +2,52 @@
 
 {% block content %}
 
-Save
+<h2 class="mb-4">Add Transaction</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <!-- Supplier -->
+    <div class="mb-3">
+        <label class="form-label">Supplier</label>
+        <select name="supplier" class="form-control" required>
+            <option value="">-- Select Supplier --</option>
+            {% for s in suppliers %}
+            <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Product -->
+    <div class="mb-3">
+        <label class="form-label">Product</label>
+        <select name="product" class="form-control" required>
+            <option value="">-- Select Product --</option>
+            {% for p in products %}
+            <option value="{{ p.id }}">{{ p.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Quantity -->
+    <div class="mb-3">
+        <label class="form-label">Quantity</label>
+        <input type="number" name="quantity" class="form-control" required>
+    </div>
+
+    <!-- Type -->
+    <div class="mb-3">
+        <label class="form-label">Transaction Type</label>
+        <select name="type" class="form-control" required>
+            <option value="IN">Stock In (Add)</option>
+            <option value="OUT">Stock Out (Remove)</option>
+        </select>
+    </div>
+
+    <!-- Buttons -->
+    <button type="submit" class="btn btn-success">Save Transaction</button>
+    <a href="{% url 'product_list' %}" class="btn btn-secondary">Cancel</a>
+
+</form>
 
 {% endblock %}
